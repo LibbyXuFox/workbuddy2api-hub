@@ -744,6 +744,31 @@ def _active_conversation_limit(status, detail):
             or "maximum number of active conversations" in text.lower())
 
 
+def _sandbox_error_hint(error):
+    """Append an actionable hint to sandbox-connection failures.
+
+    When a network filter intercepts `*.sandbox.cloudstudio.club` it answers the
+    TLS ClientHello with a plain-text block page, so Python reports
+    `SSLError: [SSL: WRONG_VERSION_NUMBER]`. Nothing in that message says the
+    network is at fault, and the panel user reads it as "the gateway is broken".
+    Measured on a Comcast xFi Advanced Security network: every web activity
+    failed this way and left the conversation stuck in `working`.
+    """
+    text = str(error or "")
+    if not text:
+        return text
+    lowered = text.lower()
+    if "wrong_version_number" in lowered or "sslerror" in lowered:
+        return (text + "（沙箱地址 TLS 握手失败：本机网络或代理可能拦截了 "
+                       "*.sandbox.cloudstudio.club，请确认该域名可达，"
+                       "或给账号配置出口代理）")
+    if ("name or service not known" in lowered
+            or "nodename nor servname" in lowered
+            or "temporary failure in name resolution" in lowered):
+        return text + "（沙箱域名解析失败：请检查本机 DNS / 代理设置）"
+    return text
+
+
 class Account(object):
     def __init__(self, data, path=None):
         data = data or {}
@@ -2203,6 +2228,7 @@ class Account(object):
                     model, result.get("chunks") or 0, result.get("elapsed_ms") or 0)
             else:
                 result["retryable"] = True
+                result["error"] = _sandbox_error_hint(result.get("error"))
             return result
         finally:
             # 收尾必须发生：不 stop 的话这条会话会一直占着上游的活跃名额，跑够十次
