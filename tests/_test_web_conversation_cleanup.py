@@ -257,6 +257,17 @@ class CleanupTests(unittest.TestCase):
                          "一次 10105 只该建一次会话，不该再漏两条")
 
     # -- 错误可读性 ----------------------------------------------------------
+    def test_a_tls_failure_explains_the_sandbox_is_unreachable(self):
+        stub = WebStub()
+        res = self.run_web(stub, turn={
+            "ok": False, "status": "",
+            "error": "SSLError: [SSL: WRONG_VERSION_NUMBER] wrong version number "
+                     "(_ssl.c:1016)"})
+        self.assertFalse(res.get("ok"))
+        self.assertIn("WRONG_VERSION_NUMBER", res.get("error", ""))
+        self.assertIn("sandbox.cloudstudio.club", res.get("error", ""),
+                      "网络拦截要给出可执行的提示，而不是一句裸 SSL 错误")
+
     def test_the_limit_detector_matches_code_and_message(self):
         self.assertTrue(wb_accounts._active_conversation_limit(429, '{"code":10105}'))
         self.assertTrue(wb_accounts._active_conversation_limit(
