@@ -38,7 +38,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 
-FROZEN = 1791445200.0
+from _frozen_clock import FROZEN  # noqa: E402  (local wall clock)
 T0 = FROZEN - 100000.0          # 日志行的基准时刻
 
 _TMP = tempfile.mkdtemp(prefix="wb-priced-fp-")

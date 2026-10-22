@@ -48,7 +48,7 @@ sys.path.insert(0, ROOT)
 
 # 与 my_dump.py 同一把冻结时钟：聚合结果里有 time.time() 派生的字段，不冻结
 # 的话「父进程算的」和「子进程算的」必然不同——那是墙钟差异，不是行为差异。
-FROZEN = 1791445200.0
+from _frozen_clock import FROZEN  # noqa: E402  (local wall clock)
 
 _TMP = tempfile.mkdtemp(prefix="wb-aggcache-")
 USAGE_DIR = os.path.join(_TMP, "usage")
