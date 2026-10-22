@@ -38,7 +38,7 @@ sys.path.insert(0, ROOT)
 
 # 与 _test_usage_day_buckets.py 同一把冻结时钟（窗口边界与 started 都从
 # time.time() 派生，不冻结就不可比）。本地时间是 2026-10-08 15:40。
-FROZEN = 1791445200.0
+from _frozen_clock import FROZEN  # noqa: E402  (local wall clock)
 
 _TMP = tempfile.mkdtemp(prefix="wb-minutes-")
 USAGE_DIR = os.path.join(_TMP, "usage")

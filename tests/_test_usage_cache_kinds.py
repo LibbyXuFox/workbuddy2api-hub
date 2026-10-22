@@ -36,7 +36,7 @@ sys.path.insert(0, ROOT)
 
 # 与 _test_usage_aggregate_cache.py 同一把冻结时钟：结果里有 time.time() 派生
 # 的字段，不冻结就不可比。
-FROZEN = 1791445200.0
+from _frozen_clock import FROZEN  # noqa: E402  (local wall clock)
 
 _TMP = tempfile.mkdtemp(prefix="wb-cachekinds-")
 USAGE_DIR = os.path.join(_TMP, "usage")

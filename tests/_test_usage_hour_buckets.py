@@ -48,7 +48,7 @@ sys.path.insert(0, ROOT)
 
 # 与 my_dump.py / _test_usage_day_buckets.py 同一把冻结时钟：窗口边界（本地
 # 午夜/整点）与 started/since 都从 time.time() 派生，不冻结就不可比。
-FROZEN = 1791445200.0
+from _frozen_clock import FROZEN  # noqa: E402  (local wall clock)
 
 _TMP = tempfile.mkdtemp(prefix="wb-hourbucket-")
 USAGE_DIR = os.path.join(_TMP, "usage")

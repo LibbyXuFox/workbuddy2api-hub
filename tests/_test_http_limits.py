@@ -140,8 +140,12 @@ class NagleFlagTests(unittest.TestCase):
             server.shutdown()
             server.server_close()
             thread.join(timeout=5)
-        self.assertEqual(Probe.seen, [1],
-                         "TCP_NODELAY is not set on the accepted connection")
+        # Linux / BSD 读回 1；Darwin 的 TCP_NODELAY 是标志位 TF_NODELAY = 0x04，
+        # setsockopt(…, 1) 之后 getsockopt 读回 4。两者都表示「已置位」。
+        self.assertEqual(len(Probe.seen), 1, "the connection was not set up")
+        self.assertIn(Probe.seen[0], (1, 4),
+                      "TCP_NODELAY is not set on the accepted connection "
+                      "(read back %r)" % (Probe.seen,))
 
 
 class BacklogTests(unittest.TestCase):
